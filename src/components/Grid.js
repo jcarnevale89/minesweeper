@@ -8,13 +8,14 @@ class Grid extends Component {
 
     this.generateGrid = this.generateGrid.bind(this)
     this.showTile = this.showTile.bind(this)
+    this.showAll = this.showAll.bind(this)
     this.getMineCount = this.getMineCount.bind(this)
 
     this.state = {
       columns: 10,
       rows: 10,
       mines: 10,
-      tiles: {},
+      tiles: [],
     }
   }
 
@@ -24,21 +25,21 @@ class Grid extends Component {
 
   generateGrid() {
 
-    const tiles = Object.assign({}, this.state.tiles)
+    const tiles = []
     const mines = []
 
     for (var y = 1; y <= this.state.rows; y++) {
       for (var x = 1; x <= this.state.columns; x++) {
-        tiles[`${x}x${y}`] = {
+        tiles.push({
           cords: {
             x: x,
             y: y,
           },
+          tileID: `${x}x${y}`,
           mine: false,
           mineCount: 0,
-          // covered: false,
           covered: true,
-        }
+        })
       }
     }
 
@@ -48,22 +49,22 @@ class Grid extends Component {
       mines[mines.length] = randomnumber;
     }
 
-    const keys = Object.keys(tiles)
-    mines
-    .forEach(mine => {
-      tiles[keys[mine]].mine = true
+    mines.forEach(mine => {
+      tiles[mine].mine = true
     })
 
-    Object.entries(tiles).map(tile => tiles[tile[0]].mineCount = this.getMineCount(tile, tiles))
+    const tileKeys = tiles.map(tile => tile.tileID)
+
+    tiles.map(tile => tile.mineCount = this.getMineCount(tile, tiles, tileKeys))
 
     this.setState({ tiles })
 
   }
 
-  getMineCount(tile, tiles) {
+  getMineCount(tile, tiles, tileKeys) {
 
-    const x = tile[1].cords.x
-    const y = tile[1].cords.y
+    const x = tile.cords.x
+    const y = tile.cords.y
     const xMin = (x > 1) ? x - 1 : x
     const xMax = (x < this.state.columns) ? x + 1 : x
     const yMin = (y > 1) ? y - 1 : y
@@ -74,7 +75,8 @@ class Grid extends Component {
     for (var yCounter = yMin; yCounter <= yMax; yCounter++) {
       for (var xCounter = xMin; xCounter <= xMax; xCounter++) {
         if (!(x === xCounter && y === yCounter)) {
-          if (tiles[`${xCounter}x${yCounter}`].mine) {
+          const index = tileKeys.indexOf(`${xCounter}x${yCounter}`)
+          if (tiles[index].mine) {
             mineCount++
           }
         }
@@ -85,25 +87,29 @@ class Grid extends Component {
   }
 
   showTile(tileID) {
-    const tiles = Object.assign({}, this.state.tiles)
+    const tiles = [...this.state.tiles]
     tiles[tileID].covered = false
+    this.setState({ tiles })
+  }
+
+  showAll() {
+    const tiles = [...this.state.tiles]
+    tiles.map(tile => tile.covered = false)
     this.setState({ tiles })
   }
 
   render() {
 
-    const tiles = Object.entries(this.state.tiles)
-
     return (
       <div>
         <div className="grid">
           {
-            tiles.map((tile) => {
+            this.state.tiles.map((tile, i) => {
               return (
                 <Tile
-                  key={tile[0]}
-                  details={tile[1]}
-                  tileID={tile[0]}
+                  key={tile.tileID}
+                  details={tile}
+                  tileID={i}
                   showTile={this.showTile}
                   columns={this.state.columns}
                 />
@@ -111,7 +117,9 @@ class Grid extends Component {
             })
           }
         </div>
+        <br/>
         <button onClick={this.generateGrid}>Generate New Grid</button>
+        <button onClick={this.showAll}>Show All Bombs</button>
       </div>
     )
   }
