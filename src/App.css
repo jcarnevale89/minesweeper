@@ -31,6 +31,22 @@
   padding: 20px;
 }
 
+.gridWrapper {
+  position: relative;
+}
+
+.gridWrapper .gameOver {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  color: #FFFFFF;
+  background-color: rgba(30, 30, 30, .75);
+  text-align: center;
+}
+
 .grid {
   width: 600px;
   height: 600px;
