@@ -7,10 +7,14 @@ const Tile = (props) => {
   }
 
   const tileCover = (props.details.covered) ? 'tileCover' : 'tileCover shown'
-  const mine = (props.details.mine) ? 'innerTile mine' : 'innerTile'
+  const mine = (props.details.mineCount === -1) ? 'innerTile mine' : 'innerTile'
+
+  const show = () => {
+    props.show(props.tileID)
+  }
 
   return (
-    <div className="tile" style={css} onClick={() => props.showTile(props.tileID)}>
+    <div className="tile" style={css} onClick={show}>
       <div className={tileCover}></div>
       <div className={mine}>
         {props.details.mineCount}
