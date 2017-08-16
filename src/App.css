@@ -1,0 +1,79 @@
+/*.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}*/
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  padding: 20px;
+}
+
+.grid {
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid black;
+}
+
+.grid .tile {
+  position: relative;
+  border: 1px solid black;
+}
+
+.grid .tile .innerTile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: #ADADAD;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.grid .tile .innerTile.mine {
+  background-color: #CC0000;
+  background-image: url('/images/bomb.png');
+  background-size: 75%;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-indent: -5000px;
+}
+
+.grid .tile .tileCover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #656565;
+}
+
+.grid .tile .tileCover.shown {
+  display: none;
+}
