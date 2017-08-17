@@ -7,11 +7,11 @@ class Grid extends Component {
     super(props)
 
     this.generateGrid = this.generateGrid.bind(this)
+    this.generateMines = this.generateMines.bind(this)
     this.getMineCount = this.getMineCount.bind(this)
     this.show = this.show.bind(this)
     this.showAll = this.showAll.bind(this)
     this.getCoords = this.getCoords.bind(this)
-    this.getSurroundingTiles = this.getSurroundingTiles.bind(this)
 
     this.state = {
       columns: 10,
@@ -29,11 +29,10 @@ class Grid extends Component {
     this.generateGrid()
   }
 
-  async generateGrid() {
+  generateGrid() {
     this.setState(this.defaultState)
 
     const tiles = []
-    const mines = []
 
     for (var y = 1; y <= this.state.rows; y++) {
       for (var x = 1; x <= this.state.columns; x++) {
@@ -52,30 +51,70 @@ class Grid extends Component {
 
     const tileKeys = tiles.map(tile => tile.tileID)
 
+    this.setState({ tiles, tileKeys }, () => {
+      console.log('Grid Generated!')
+      this.generateMines()
+    })
+
+  }
+
+  generateMines() {
+    const tiles = [...this.state.tiles]
+    const mines = []
+
     while(mines.length < this.state.mines){
       var randomnumber = Math.ceil(Math.random()*(this.state.columns*this.state.rows)) - 1
       if(mines.indexOf(randomnumber) > -1) continue;
       mines[mines.length] = randomnumber;
     }
 
-    mines.forEach(mine => {
+    mines.forEach((mine) => {
       tiles[mine].mineCount = -1
     })
 
-    await this.setState({ tiles, tileKeys })
-
-    tiles.forEach((tile) => {
-      tile.mineCount = this.getMineCount(tile)
-      tile.surroundingTiles = this.getSurroundingTiles(tile)
+    this.setState({ tiles }, () => {
+      console.log('Mines Generated!')
+      this.getMineCount()
     })
-
-    await this.setState({ tiles })
-
   }
 
-  getCoords(tile) {
-    const x = tile.coords.x
-    const y = tile.coords.y
+  getMineCount() {
+    const tiles = [...this.state.tiles]
+
+    tiles.forEach((tile, i) => {
+      let mineCount = -1
+      const surroundingTiles = []
+
+      if (tile.mineCount !== -1) {
+        mineCount = 0
+        const coords = this.getCoords(i)
+
+        for (var y = coords.yMin; y <= coords.yMax; y++) {
+          for (var x = coords.xMin; x <= coords.xMax; x++) {
+            if (!(coords.x === x && coords.y === y)) {
+              const index = this.state.tileKeys.indexOf(`${x}x${y}`)
+              surroundingTiles.push(index)
+              if (tiles[index].mineCount === -1) {
+                mineCount++
+              }
+            }
+          }
+        }
+      }
+
+      tile.mineCount = mineCount
+      tile.surroundingTiles = surroundingTiles
+    })
+
+     this.setState({ tiles }, () => {
+      console.log('Mines Count Completed!')
+    })
+  }
+
+  getCoords(tileKey) {
+
+    const x = this.state.tiles[tileKey].coords.x
+    const y = this.state.tiles[tileKey].coords.y
     const xMin = (x > 1) ? x - 1 : x
     const xMax = (x < this.state.columns) ? x + 1 : x
     const yMin = (y > 1) ? y - 1 : y
@@ -89,42 +128,6 @@ class Grid extends Component {
       yMin,
       yMax,
     }
-  }
-
-  getSurroundingTiles(tile) {
-    const surroundingTiles = []
-
-    const coords = this.getCoords(tile)
-
-    for (var yCounter = coords.yMin; yCounter <= coords.yMax; yCounter++) {
-      for (var xCounter = coords.xMin; xCounter <= coords.xMax; xCounter++) {
-        if (!(coords.x === xCounter && coords.y === yCounter)) {
-          const index = this.state.tileKeys.indexOf(`${xCounter}x${yCounter}`)
-          surroundingTiles.push(index)
-        }
-      }
-    }
-    return surroundingTiles
-  }
-
-  getMineCount(tile) {
-    if (tile.mineCount === -1) return -1
-
-    const coords = this.getCoords(tile)
-    let mineCount = 0
-
-    for (var yCounter = coords.yMin; yCounter <= coords.yMax; yCounter++) {
-      for (var xCounter = coords.xMin; xCounter <= coords.xMax; xCounter++) {
-        if (!(coords.x === xCounter && coords.y === yCounter)) {
-          const index = this.state.tileKeys.indexOf(`${xCounter}x${yCounter}`)
-          if (this.state.tiles[index].mineCount === -1) {
-            mineCount++
-          }
-        }
-      }
-    }
-
-    return mineCount
   }
 
   show(tileID) {
