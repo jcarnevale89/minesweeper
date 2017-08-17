@@ -8,25 +8,16 @@ class Grid extends Component {
 
     this.generateGrid = this.generateGrid.bind(this)
     this.generateMines = this.generateMines.bind(this)
-    this.getMineCount = this.getMineCount.bind(this)
+    this.generateMineCount = this.generateMineCount.bind(this)
     this.show = this.show.bind(this)
+    this.flag = this.flag.bind(this)
     this.showAll = this.showAll.bind(this)
-    this.getCoords = this.getCoords.bind(this)
+    this.getCoordinates = this.getCoordinates.bind(this)
     this.clear = this.clear.bind(this)
 
-    /*
-    Minesweeper Defaults
-    Beginner: 9x9 - 9 Mines
-    Intermediate: 16x16 - 40 Mines
-    Beginner: 16x30 - 99 Mines
-    */
-
-
     this.state = {
-      columns: 9,
-      rows: 9,
-      mines: 9,
       tiles: [],
+      flagCount: 0,
       gameOver: false,
     }
 
@@ -42,8 +33,8 @@ class Grid extends Component {
 
     const tiles = []
 
-    for (var y = 1; y <= this.state.rows; y++) {
-      for (var x = 1; x <= this.state.columns; x++) {
+    for (var y = 1; y <= this.props.rows; y++) {
+      for (var x = 1; x <= this.props.columns; x++) {
         tiles.push({
           coords: {
             x: x,
@@ -52,6 +43,7 @@ class Grid extends Component {
           tileID: `${x}x${y}`,
           mineCount: 0,
           covered: true,
+          flagged: false,
           surroundingTiles: [],
         })
       }
@@ -68,8 +60,8 @@ class Grid extends Component {
     const tiles = [...this.state.tiles]
     const mines = []
 
-    while(mines.length < this.state.mines){
-      var randomnumber = Math.ceil(Math.random()*(this.state.columns*this.state.rows)) - 1
+    while(mines.length < this.props.mines){
+      var randomnumber = Math.ceil(Math.random()*(this.props.columns*this.props.rows)) - 1
       if(mines.indexOf(randomnumber) > -1) continue;
       mines[mines.length] = randomnumber;
     }
@@ -80,11 +72,11 @@ class Grid extends Component {
 
     this.setState({ tiles }, () => {
       console.log('Mines Generated!')
-      this.getMineCount()
+      this.generateMineCount()
     })
   }
 
-  getMineCount() {
+  generateMineCount() {
     const tiles = [...this.state.tiles]
     const tileKeys = tiles.map(tile => tile.tileID)
 
@@ -94,7 +86,7 @@ class Grid extends Component {
 
       if (tile.mineCount !== -1) {
         mineCount = 0
-        const coords = this.getCoords(i)
+        const coords = this.getCoordinates(i)
 
         for (var y = coords.yMin; y <= coords.yMax; y++) {
           for (var x = coords.xMin; x <= coords.xMax; x++) {
@@ -118,14 +110,14 @@ class Grid extends Component {
     })
   }
 
-  getCoords(tileKey) {
+  getCoordinates(tileKey) {
 
     const x = this.state.tiles[tileKey].coords.x
     const y = this.state.tiles[tileKey].coords.y
     const xMin = (x > 1) ? x - 1 : x
-    const xMax = (x < this.state.columns) ? x + 1 : x
+    const xMax = (x < this.props.columns) ? x + 1 : x
     const yMin = (y > 1) ? y - 1 : y
-    const yMax = (y < this.state.rows) ? y + 1 : y
+    const yMax = (y < this.props.rows) ? y + 1 : y
 
     return {
       x,
@@ -146,12 +138,33 @@ class Grid extends Component {
     })
   }
 
-  show(tileID) {
+  flag(tileID) {
+    if (!this.state.tiles[tileID].covered) return
     const tiles = [...this.state.tiles]
 
+    tiles[tileID].flagged = !tiles[tileID].flagged
+
+    const flagCount = tiles.filter((tile) => {
+      return tile.flagged
+    }).length
+
+    this.setState({ tiles, flagCount })
+  }
+
+  show(tileID) {
+    if (this.state.tiles[tileID].flagged) return
+
+    const tiles = [...this.state.tiles]
     tiles[tileID].covered = false
 
     if (tiles[tileID].mineCount < 0) {
+      tiles.filter((tile) => {
+        return tile.mineCount === -1
+      })
+      .forEach((tile) => {
+        tile.covered = false
+      })
+
       this.setState({ gameOver: true })
     }
 
@@ -171,34 +184,37 @@ class Grid extends Component {
   render() {
 
     return (
-      <div className="gridWrapper">
-        {
-          (this.state.gameOver)
-          ?
-          <div className="gameOver">
-            you ded
-            <br/>
-            <button onClick={this.generateGrid}>New Game</button>
-          </div>
-          :
-          ''
-        }
-        <div className="grid">
+      <div>
+        <div className="gridWrapper">
           {
-            this.state.tiles.map((tile, i) => {
-              return (
-                <Tile
-                  key={tile.tileID}
-                  details={tile}
-                  tileID={i}
-                  show={this.show}
-                  columns={this.state.columns}
-                />
-              )
-            })
+            (this.state.gameOver)
+            ?
+            <div className="gameOver">
+              you ded
+              <br/>
+              <button onClick={this.generateGrid}>New Game</button>
+            </div>
+            :
+            ''
           }
+          <div className="grid">
+            {
+              this.state.tiles.map((tile, i) => {
+                return (
+                  <Tile
+                    key={tile.tileID}
+                    columns={this.props.columns}
+                    details={tile}
+                    tileID={i}
+                    tileSize={this.props.tileSize}
+                    show={this.show}
+                    flag={this.flag}
+                  />
+                )
+              })
+            }
+          </div>
         </div>
-        <br/>
         <button onClick={this.generateGrid}>Generate New Grid</button>
         <button onClick={this.showAll}>Show All Bombs</button>
       </div>
