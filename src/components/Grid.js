@@ -9,12 +9,14 @@ class Grid extends Component {
     this.generateGrid = this.generateGrid.bind(this)
     this.show = this.show.bind(this)
     this.flag = this.flag.bind(this)
-    this.showAll = this.showAll.bind(this)
+    this.startNewGame = this.startNewGame.bind(this)
 
     this.state = {
       tiles: [],
       flagCount: 0,
+      gameState: 'start',
       gameOver: false,
+      timer: 0,
     }
 
     this.defaultState = this.state
@@ -25,8 +27,6 @@ class Grid extends Component {
   }
 
   generateGrid() {
-    this.setState(this.defaultState)
-
     const tiles = []
 
     for (var y = 1; y <= this.props.rows; y++) {
@@ -125,6 +125,44 @@ class Grid extends Component {
     }
   }
 
+  getOverlay() {
+    return {
+      start: () => (
+        <div className="overlay">
+          <div className="logo"></div>
+          <p>Minesweeper</p>
+          <button onClick={() => {this.setOverlay('inProgress')}}>Start Game</button>
+        </div>
+      ),
+      end: () => (
+        <div className="overlay">
+          <div className="gameover"></div>
+          <p>Game Over!</p>
+          <button onClick={this.startNewGame}>Start New Game</button>
+          <button onClick={() => {this.startNewGame(false)}}>Main Menu</button>
+        </div>
+      ),
+      inProgress: () => (
+        <div className="overlay inProgress">
+          Game is in progress
+        </div>
+      ),
+      win: () => (
+        <div className="overlay">
+          <div className="winner"></div>
+          <p>Congratulations!</p>
+          <button onClick={this.startNewGame}>Start New Game</button>
+          <button onClick={() => {this.startNewGame(false)}}>Main Menu</button>
+        </div>
+      ),
+    }[this.state.gameState]()
+  }
+
+  setOverlay(gameState) {
+    if (gameState === this.state.gameState) return
+    this.setState({ gameState })
+  }
+
   clear(tileID) {
     this.state.tiles[tileID].surroundingTiles.forEach((tileID) => {
       const tile = this.state.tiles[tileID]
@@ -161,7 +199,15 @@ class Grid extends Component {
         tile.covered = false
       })
 
+      this.setOverlay('end')
       this.setState({ gameOver: true })
+    } else {
+      const winTest = tiles.filter((tile) => {
+        return tile.mineCount !== -1 && tile.covered
+      })
+      if (winTest.length === 0) {
+        this.setOverlay('win')
+      }
     }
 
     if (tiles[tileID].mineCount === 0) {
@@ -171,28 +217,23 @@ class Grid extends Component {
     this.setState({ tiles })
   }
 
-  showAll() {
-    const tiles = [...this.state.tiles]
-    tiles.map(tile => tile.covered = false)
-    this.setState({ tiles })
+  startNewGame(bool = true) {
+    this.setState(this.defaultState)
+    this.generateGrid()
+    if (bool) {
+      this.setOverlay('inProgress')
+    }
   }
 
   render() {
-
     return (
       <div>
+        <div className="displayWrapper">
+          <div className="bombCount">Mines: {this.props.mines}</div>
+          <div className="timer">Time: {this.state.timer}</div>
+        </div>
         <div className="gridWrapper">
-          {
-            (this.state.gameOver)
-            ?
-            <div className="gameOver">
-              you ded
-              <br/>
-              <button onClick={this.generateGrid}>New Game</button>
-            </div>
-            :
-            ''
-          }
+          {this.getOverlay()}
           <div className="grid">
             {
               this.state.tiles.map((tile, i) => {
@@ -211,8 +252,6 @@ class Grid extends Component {
             }
           </div>
         </div>
-        <button onClick={this.generateGrid}>Generate New Grid</button>
-        <button onClick={this.showAll}>Show All Bombs</button>
       </div>
     )
   }
