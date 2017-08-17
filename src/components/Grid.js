@@ -229,7 +229,7 @@ class Grid extends Component {
     return (
       <div>
         <div className="displayWrapper">
-          <div className="bombCount">Mines: {this.props.mines}</div>
+          <div className="bombCount">Mines: {this.props.mines - this.state.flagCount}</div>
           <div className="timer">Time: {this.state.timer}</div>
         </div>
         <div className="gridWrapper">

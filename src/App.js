@@ -19,7 +19,7 @@ class App extends Component {
       tileSize: 25,
       columns: 9,
       rows: 9,
-      mines: 3,
+      mines: 9,
     }
   }
 
