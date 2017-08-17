@@ -12,13 +12,21 @@ class Grid extends Component {
     this.show = this.show.bind(this)
     this.showAll = this.showAll.bind(this)
     this.getCoords = this.getCoords.bind(this)
+    this.clear = this.clear.bind(this)
+
+    /*
+    Minesweeper Defaults
+    Beginner: 9x9 - 9 Mines
+    Intermediate: 16x16 - 40 Mines
+    Beginner: 16x30 - 99 Mines
+    */
+
 
     this.state = {
-      columns: 10,
-      rows: 10,
-      mines: 10,
+      columns: 9,
+      rows: 9,
+      mines: 9,
       tiles: [],
-      tileKeys: [],
       gameOver: false,
     }
 
@@ -49,9 +57,7 @@ class Grid extends Component {
       }
     }
 
-    const tileKeys = tiles.map(tile => tile.tileID)
-
-    this.setState({ tiles, tileKeys }, () => {
+    this.setState({ tiles }, () => {
       console.log('Grid Generated!')
       this.generateMines()
     })
@@ -80,6 +86,7 @@ class Grid extends Component {
 
   getMineCount() {
     const tiles = [...this.state.tiles]
+    const tileKeys = tiles.map(tile => tile.tileID)
 
     tiles.forEach((tile, i) => {
       let mineCount = -1
@@ -92,7 +99,7 @@ class Grid extends Component {
         for (var y = coords.yMin; y <= coords.yMax; y++) {
           for (var x = coords.xMin; x <= coords.xMax; x++) {
             if (!(coords.x === x && coords.y === y)) {
-              const index = this.state.tileKeys.indexOf(`${x}x${y}`)
+              const index = tileKeys.indexOf(`${x}x${y}`)
               surroundingTiles.push(index)
               if (tiles[index].mineCount === -1) {
                 mineCount++
@@ -130,6 +137,15 @@ class Grid extends Component {
     }
   }
 
+  clear(tileID) {
+    this.state.tiles[tileID].surroundingTiles.forEach((tileID) => {
+      const tile = this.state.tiles[tileID]
+      if (tile.covered) {
+        this.show(tileID)
+      }
+    })
+  }
+
   show(tileID) {
     const tiles = [...this.state.tiles]
 
@@ -137,6 +153,10 @@ class Grid extends Component {
 
     if (tiles[tileID].mineCount < 0) {
       this.setState({ gameOver: true })
+    }
+
+    if (tiles[tileID].mineCount === 0) {
+      this.clear(tileID)
     }
 
     this.setState({ tiles })
