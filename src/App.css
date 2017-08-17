@@ -27,22 +27,38 @@
   padding: 20px;
 }
 
+.logo {
+  width: 70px;
+  height: 70px;
+  background-image: url('/images/logo.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .gridContainer {
   margin: 0 auto;
   text-align: center;
   border: 3px solid #707070;
 }
 
+.displayWrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 3px solid #707070;
+}
+
 .gridWrapper {
   position: relative;
-  margin-bottom: 20px;
 }
 
 .gridWrapper * {
   box-sizing: border-box;
 }
 
-.gridWrapper .gameOver {
+.gridWrapper .overlay {
   position: absolute;
   top: 0;
   right: 0;
@@ -50,8 +66,27 @@
   left: 0;
   z-index: 100;
   color: #FFFFFF;
-  background-color: rgba(30, 30, 30, .5);
+  background-color: rgba(0, 0, 0, .5);
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+}
+
+.gridWrapper .overlay .gameover {
+  width: 70px;
+  height: 70px;
+  background-image: url('/images/bomb.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.gridWrapper .overlay.inProgress {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .grid {
