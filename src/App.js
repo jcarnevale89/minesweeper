@@ -17,9 +17,9 @@ class App extends Component {
 
     this.state = {
       tileSize: 25,
-      columns: 20,
-      rows: 10,
-      mines: 60,
+      columns: 9,
+      rows: 9,
+      mines: 3,
     }
   }
 
