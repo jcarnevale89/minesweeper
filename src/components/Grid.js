@@ -7,13 +7,9 @@ class Grid extends Component {
     super(props)
 
     this.generateGrid = this.generateGrid.bind(this)
-    this.generateMines = this.generateMines.bind(this)
-    this.generateMineCount = this.generateMineCount.bind(this)
     this.show = this.show.bind(this)
     this.flag = this.flag.bind(this)
     this.showAll = this.showAll.bind(this)
-    this.getCoordinates = this.getCoordinates.bind(this)
-    this.clear = this.clear.bind(this)
 
     this.state = {
       tiles: [],
