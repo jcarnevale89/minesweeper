@@ -23,16 +23,23 @@
   to { transform: rotate(360deg); }
 }*/
 
-* {
-  box-sizing: border-box;
-}
-
 #root {
   padding: 20px;
 }
 
+.gridContainer {
+  margin: 0 auto;
+  text-align: center;
+  border: 3px solid #707070;
+}
+
 .gridWrapper {
   position: relative;
+  margin-bottom: 20px;
+}
+
+.gridWrapper * {
+  box-sizing: border-box;
 }
 
 .gridWrapper .gameOver {
@@ -43,22 +50,44 @@
   left: 0;
   z-index: 100;
   color: #FFFFFF;
-  background-color: rgba(30, 30, 30, .75);
+  background-color: rgba(30, 30, 30, .5);
   text-align: center;
 }
 
 .grid {
-  width: 600px;
-  height: 600px;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  border: 1px solid black;
 }
 
 .grid .tile {
   position: relative;
-  border: 1px solid black;
+}
+
+.grid .tile .tileCover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #D9D9D9;
+  border-width: 3px;
+  border-style: solid;
+  border-top-color: #FFFFFF;
+  border-right-color: #707070;
+  border-bottom-color: #707070;
+  border-left-color: #FFFFFF;
+}
+
+.grid .tile .tileCover.shown {
+  display: none;
+}
+
+.grid .tile .tileCover.flagged {
+  background-image: url('/images/flag.png');
+  background-size: 75%;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .grid .tile .innerTile {
@@ -67,9 +96,10 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: #ADADAD;
+  background-color: #B5B5B5;
   font-size: 19px;
   font-weight: 700;
+  border: 1px solid #707070;
 }
 
 .grid .tile .innerTile.mine {
@@ -81,15 +111,56 @@
   text-indent: -5000px;
 }
 
-.grid .tile .tileCover {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: #656565;
+.grid .tile .innerTile.color-0 {
+  color: #999999;
 }
 
-.grid .tile .tileCover.shown {
-  display: none;
+.grid .tile .innerTile.color-1 {
+  color: #0009FF;
 }
+
+.grid .tile .innerTile.color-2 {
+  color: #017000;
+}
+
+.grid .tile .innerTile.color-3 {
+  color: #CC0000;
+}
+
+.grid .tile .innerTile.color-4 {
+  color: #000270;
+}
+
+.grid .tile .innerTile.color-5 {
+  color: #700000;
+}
+
+.grid .tile .innerTile.color-6 {
+  color: #007070;
+}
+
+.grid .tile .innerTile.color-7 {
+  color: #000000;
+}
+
+.grid .tile .innerTile.color-8 {
+  color: #707070;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
