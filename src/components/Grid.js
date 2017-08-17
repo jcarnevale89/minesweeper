@@ -9,6 +9,7 @@ class Grid extends Component {
     this.generateGrid = this.generateGrid.bind(this)
     this.getMineCount = this.getMineCount.bind(this)
     this.show = this.show.bind(this)
+    this.showAll = this.showAll.bind(this)
     this.getCoords = this.getCoords.bind(this)
     this.getSurroundingTiles = this.getSurroundingTiles.bind(this)
 
@@ -20,14 +21,16 @@ class Grid extends Component {
       tileKeys: [],
       gameOver: false,
     }
+
+    this.defaultState = this.state
   }
 
   componentDidMount(){
     this.generateGrid()
   }
 
-  generateGrid() {
-    this.setState({ gameOver: false })
+  async generateGrid() {
+    this.setState(this.defaultState)
 
     const tiles = []
     const mines = []
@@ -48,7 +51,6 @@ class Grid extends Component {
     }
 
     const tileKeys = tiles.map(tile => tile.tileID)
-    this.setState({ tileKeys })
 
     while(mines.length < this.state.mines){
       var randomnumber = Math.ceil(Math.random()*(this.state.columns*this.state.rows)) - 1
@@ -60,11 +62,14 @@ class Grid extends Component {
       tiles[mine].mineCount = -1
     })
 
+    await this.setState({ tiles, tileKeys })
+
     tiles.forEach((tile) => {
+      tile.mineCount = this.getMineCount(tile)
       tile.surroundingTiles = this.getSurroundingTiles(tile)
     })
 
-    this.setState({ tiles })
+    await this.setState({ tiles })
 
   }
 
@@ -122,22 +127,21 @@ class Grid extends Component {
     return mineCount
   }
 
-  show(tileID = -1) {
+  show(tileID) {
     const tiles = [...this.state.tiles]
 
-    if (tileID > -1) {
-      tiles[tileID].covered = false
+    tiles[tileID].covered = false
 
-      if (tiles[tileID].mineCount > -1) {
-        const mineCount = this.getMineCount(tiles[tileID])
-        tiles[tileID].mineCount = mineCount
-      } else {
-        this.setState({ gameOver: true })
-      }
-
-    } else {
-      tiles.map(tile => tile.covered = false)
+    if (tiles[tileID].mineCount < 0) {
+      this.setState({ gameOver: true })
     }
+
+    this.setState({ tiles })
+  }
+
+  showAll() {
+    const tiles = [...this.state.tiles]
+    tiles.map(tile => tile.covered = false)
     this.setState({ tiles })
   }
 
@@ -173,7 +177,7 @@ class Grid extends Component {
         </div>
         <br/>
         <button onClick={this.generateGrid}>Generate New Grid</button>
-        <button onClick={this.show}>Show All Bombs</button>
+        <button onClick={this.showAll}>Show All Bombs</button>
       </div>
     )
   }
