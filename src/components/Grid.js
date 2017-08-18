@@ -22,7 +22,7 @@ class Grid extends Component {
     this.defaultState = this.state
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.generateGrid()
   }
 
