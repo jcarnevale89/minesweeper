@@ -12,14 +12,14 @@ class App extends Component {
     Minesweeper Defaults
     Beginner: 9x9 - 9 Mines
     Intermediate: 16x16 - 40 Mines
-    Beginner: 16x30 - 99 Mines
+    Expert: 16x30 - 99 Mines
     */
 
     this.state = {
       tileSize: 25,
-      columns: 10,
-      rows: 10,
-      mines: 10,
+      columns: 30,
+      rows: 16,
+      mines: 99,
     }
   }
 

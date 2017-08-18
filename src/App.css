@@ -146,6 +146,10 @@
   text-indent: -5000px;
 }
 
+.grid .tile .innerTile.mine.flagged {
+  background-color: #017000;
+}
+
 .grid .tile .innerTile.color-0 {
   color: #999999;
 }

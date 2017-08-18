@@ -16,6 +16,10 @@ const Tile = (props) => {
     tileCover.push('flagged')
   }
 
+  if (props.details.flagged && props.details.mineCount === -1) {
+    innerTile.push('flagged')
+  }
+
   switch (props.details.mineCount) {
     case -1:
       innerTile.push('mine')
