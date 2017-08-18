@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Tile from './Tile'
+import Timer from './Timer'
 
 class Grid extends Component {
 
@@ -10,12 +11,13 @@ class Grid extends Component {
     this.show = this.show.bind(this)
     this.flag = this.flag.bind(this)
     this.startNewGame = this.startNewGame.bind(this)
+    this.mainMenu = this.mainMenu.bind(this)
+    this.keepTime = this.keepTime.bind(this)
 
     this.state = {
       tiles: [],
       flagCount: 0,
       gameState: 'start',
-      gameOver: false,
       timer: 0,
     }
 
@@ -131,7 +133,7 @@ class Grid extends Component {
         <div className="overlay">
           <div className="logo"></div>
           <p>Minesweeper</p>
-          <button onClick={() => {this.setOverlay('inProgress')}}>Start Game</button>
+          <button onClick={this.startNewGame}>Start Game</button>
         </div>
       ),
       end: () => (
@@ -139,7 +141,7 @@ class Grid extends Component {
           <div className="gameover"></div>
           <p>Game Over!</p>
           <button onClick={this.startNewGame}>Start New Game</button>
-          <button onClick={() => {this.startNewGame(false)}}>Main Menu</button>
+          <button onClick={this.mainMenu}>Main Menu</button>
         </div>
       ),
       inProgress: () => (
@@ -152,7 +154,7 @@ class Grid extends Component {
           <div className="winner"></div>
           <p>Congratulations!</p>
           <button onClick={this.startNewGame}>Start New Game</button>
-          <button onClick={() => {this.startNewGame(false)}}>Main Menu</button>
+          <button onClick={this.mainMenu}>Main Menu</button>
         </div>
       ),
     }[this.state.gameState]()
@@ -200,13 +202,14 @@ class Grid extends Component {
       })
 
       this.setOverlay('end')
-      this.setState({ gameOver: true })
+      this.setState({ timer: 0 })
     } else {
       const winTest = tiles.filter((tile) => {
         return tile.mineCount !== -1 && tile.covered
       })
       if (winTest.length === 0) {
         this.setOverlay('win')
+        this.setState({ timer: 0 })
       }
     }
 
@@ -217,12 +220,20 @@ class Grid extends Component {
     this.setState({ tiles })
   }
 
-  startNewGame(bool = true) {
+  startNewGame() {
     this.setState(this.defaultState)
     this.generateGrid()
-    if (bool) {
-      this.setOverlay('inProgress')
-    }
+    this.setOverlay('inProgress')
+    this.setState({ timer: <Timer keepTime={this.keepTime} /> })
+  }
+
+  keepTime(timer) {
+    this.setState({ timer })
+  }
+
+  mainMenu() {
+    this.setState(this.defaultState)
+    this.generateGrid()
   }
 
   render() {
