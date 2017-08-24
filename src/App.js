@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import 'normalize.css'
 import './App.css'
 import Grid from './components/Grid'
 
@@ -17,9 +16,9 @@ class App extends Component {
 
     this.state = {
       tileSize: 25,
-      columns: 30,
+      columns: 16,
       rows: 16,
-      mines: 99,
+      mines: 40,
     }
   }
 
